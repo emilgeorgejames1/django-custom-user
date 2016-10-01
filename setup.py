@@ -1,17 +1,22 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
+import re
 import sys
 
-import custom_user
+from setuptools import find_packages, setup
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
 
-version = custom_user.__version__
+def get_version(package):
+    """
+    Return package version as listed in `__version__` in `init.py`.
+    """
+    init_py = open(os.path.join('src', package, '__init__.py')).read()
+    return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
+
+
+version = get_version('custom_user')
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist bdist_wheel upload')
@@ -30,10 +35,8 @@ setup(
     author='Josep Cugat',
     author_email='jcugat@gmail.com',
     url='https://github.com/jcugat/django-custom-user',
-    packages=[
-        'custom_user',
-        'custom_user.migrations',
-    ],
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     install_requires=[
         "Django >= 1.5",
